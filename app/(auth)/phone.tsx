@@ -10,8 +10,10 @@ export default function Phone() {
   const router = useRouter()
 
   const submit = async () => {
+    if (!phone) return
+
     await sendOtp(phone)
-    setPhone(phone)
+    setPhone(phone) // ✅ endi ishlaydi
     router.push('/otp')
   }
 
@@ -30,7 +32,9 @@ export default function Phone() {
       />
 
       <Pressable onPress={submit} className="bg-white py-4 rounded-2xl">
-        <Text className="text-center font-semibold">OTP yuborish</Text>
+        <Text className="text-center font-semibold">
+          OTP yuborish
+        </Text>
       </Pressable>
     </View>
   )

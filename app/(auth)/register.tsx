@@ -13,29 +13,35 @@ export default function Register() {
   const [fullName, setFullName] = useState('')
 
   const submit = async () => {
-    if (!phone || !otpCode) return
+    try {
+      if (!phone || !otpCode) return
 
-    const res = await registerUser({
-      phone,
-      username,
-      password,
-      code: otpCode,
-      full_name: fullName,
-      device_type: 'mobile',
-      device_name: 'iPhone',
-      device_id: 'DEVICE_ID',
-    })
+      const res = await registerUser({
+        phone,
+        username,
+        password,
+        code: otpCode,              // DEV: 111111
+        full_name: fullName,
+        device_type: 'mobile',
+        device_name: 'iPhone',
+        device_id: Date.now().toString(), // vaqtincha OK
+        notification_id: 'test',          // ❗️ SHART
+      })
 
-    const { tokens, user } = res.data.data
+      const { tokens, user } = res.data.data
 
-    await setAuth({
-      accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token,
-      user,
-    })
+      await setAuth({
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        user,
+      })
 
-    router.replace('/(tabs)/home')
+      router.replace('/(tabs)/home')
+    } catch (e: any) {
+      console.log('REGISTER ERROR:', e.response?.data || e.message)
+    }
   }
+
 
   return (
     <View className="flex-1 bg-black px-6 justify-center">
