@@ -143,7 +143,7 @@ export default function Login() {
         className="bg-white py-4 rounded-2xl mb-8"
       >
         <Text className="text-center font-semibold text-black text-base">
-          {loading ? 'Загрузка...' : 'Войти'}
+          {loading ? 'Загрузка..' : 'Войти'}
         </Text>
       </Pressable>
     </View>
