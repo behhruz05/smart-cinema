@@ -1,10 +1,6 @@
 import { api } from './api'
 
-// 1️⃣ OTP yuborish
-export const sendOtp = (phone: string) =>
-  api.post('/api/v1/auth/send-otp', { phone })
-
-// 2️⃣ REGISTER (OTP shu yerda tekshiriladi)
+// REGISTER
 export const registerUser = (payload: {
   phone: string
   username: string
@@ -17,9 +13,11 @@ export const registerUser = (payload: {
   notification_id: string
 }) => api.post('/api/v1/auth/register', payload)
 
+// LOGIN
 export const loginUser = (payload: {
-  login_type: 'phone'
-  phone: string
+  login_type: 'phone' | 'username'
+  phone?: string
+  username?: string
   password: string
   device_id: string
   device_type: string

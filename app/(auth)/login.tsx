@@ -58,37 +58,35 @@ export default function Login() {
       </Text>
 
       {/* Toggle Switcher */}
-      <View className="bg-[#1c1c1e] rounded-2xl p-1 flex-row mb-6">
+      {/* Toggle Switcher */}
+      <View className="bg-[#2c2c2e] rounded-full p-1 flex-row mb-6">
         <Pressable
           onPress={() => setLoginType('phone')}
-          className={`flex-1 py-3 rounded-xl ${
-            loginType === 'phone' ? 'bg-white' : ''
-          }`}
+          className={`flex-1 py-3 rounded-full ${loginType === 'phone' ? 'bg-black' : ''
+            }`}
         >
           <Text
-            className={`text-center font-semibold ${
-              loginType === 'phone' ? 'text-black' : 'text-gray-400'
-            }`}
+            className={`text-center text-sm font-medium ${loginType === 'phone' ? 'text-white' : 'text-gray-400'
+              }`}
           >
-            📱 Телефон
+            Телефон
           </Text>
         </Pressable>
 
         <Pressable
           onPress={() => setLoginType('username')}
-          className={`flex-1 py-3 rounded-xl ${
-            loginType === 'username' ? 'bg-white' : ''
-          }`}
+          className={`flex-1 py-3 rounded-full ${loginType === 'username' ? 'bg-black' : ''
+            }`}
         >
           <Text
-            className={`text-center font-semibold ${
-              loginType === 'username' ? 'text-black' : 'text-gray-400'
-            }`}
+            className={`text-center text-sm font-medium ${loginType === 'username' ? 'text-white' : 'text-gray-400'
+              }`}
           >
-            👤 Username
+            Логин
           </Text>
         </Pressable>
       </View>
+
 
       {/* Input Field */}
       <View className="mb-4">
@@ -120,7 +118,7 @@ export default function Login() {
       <View className="mb-4">
         <View className="flex-row justify-between items-center mb-2">
           <Text className="text-white text-sm">Пароль</Text>
-          <Pressable>
+          <Pressable onPress={() => router.push('/(auth)/forgot-password')}>
             <Text className="text-blue-500 text-sm">Забыли пароль?</Text>
           </Pressable>
         </View>
