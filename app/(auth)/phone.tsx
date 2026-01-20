@@ -5,106 +5,88 @@ import { useState } from 'react'
 import { ActivityIndicator, Alert, Pressable, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+const normalizePhone = (value: string) => {
+  const digits = value.replace(/\D/g, '')
+  if (digits.length !== 12 || !digits.startsWith('998')) return null
+  return `+${digits}`
+}
+
 export default function Phone() {
   const router = useRouter()
   const { setPhone, profileData } = useAuthStore()
-
-  const [phoneLocal, setPhoneLocal] = useState('+998')
-  const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [phone, setPhoneLocal] = useState('+998')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async () => {
-    if (!phoneLocal || phoneLocal.length < 13) {
-      Alert.alert('Xatolik', 'To\'g\'ri telefon raqamni kiriting')
-      return
-    }
+  const inputClass = 'bg-[#1f1f1f] text-white rounded-xl px-4 py-4 text-base'
 
-    if (!acceptedTerms) {
-      Alert.alert('Xatolik', 'Foydalanuvchi shartnomasi va maxfiylik siyosatini qabul qiling')
-      return
-    }
-
+  const submit = async () => {
     if (!profileData) {
-      Alert.alert('Xatolik', 'Profil ma\'lumotlari topilmadi')
-      router.replace('/(auth)/register')
+      Alert.alert('Xatolik', 'Profil to\'ldirilmagan')
+      return
+    }
+
+    const normalized = normalizePhone(phone)
+    if (!normalized) {
+      Alert.alert('Xatolik', 'Telefon +998XXXXXXXXX formatda bo\'lishi kerak')
       return
     }
 
     setLoading(true)
     try {
-      await sendOtp(phoneLocal)
-      setPhone(phoneLocal)
+      await sendOtp(normalized)
+      setPhone(normalized)
       router.push('/(auth)/otp')
-    } catch (error: any) {
-      Alert.alert(
-        'Xatolik', 
-        error.response?.data?.message || 'OTP yuborishda xatolik yuz berdi'
-      )
+    } catch {
+      Alert.alert('Xatolik', 'OTP yuborilmadi')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-black px-6">
-      <View className="flex-1 justify-between py-8">
-        <View>
-          <Text className="text-gray-400 text-sm mb-6">Sign up / Phone number</Text>
-          
-          <Text className="text-white text-3xl font-semibold mb-2">
-            Введите номер телефона
-          </Text>
-          <Text className="text-gray-400 mb-8">
-            Введите свой номер, чтобы продолжить регистрацию
-          </Text>
+    <SafeAreaView className="flex-1 bg-black px-6 py-8 justify-between">
+      <View>
+        <Text className="text-gray-400 text-sm mb-6">Sign up / Phone number</Text>
 
-          {/* Phone Input */}
-          <View className="mb-6">
-            <Text className="text-gray-400 text-sm mb-2">Номер телефона</Text>
-            <TextInput
-              value={phoneLocal}
-              onChangeText={setPhoneLocal}
-              placeholder="+998"
-              placeholderTextColor="#666"
-              keyboardType="phone-pad"
-              maxLength={13}
-              className="bg-[#1c1c1e] text-white rounded-xl px-4 py-4"
-            />
-          </View>
+        <Text className="text-white text-3xl font-semibold mb-2">
+          Введите номер телефона
+        </Text>
 
-          {/* Terms Checkbox */}
-          <Pressable 
-            onPress={() => setAcceptedTerms(!acceptedTerms)}
-            className="flex-row items-start mb-6"
-          >
-            <View className={`w-5 h-5 rounded border-2 mr-3 items-center justify-center ${
-              acceptedTerms ? 'bg-blue-500 border-blue-500' : 'border-gray-600'
-            }`}>
-              {acceptedTerms && <Text className="text-white text-xs">✓</Text>}
-            </View>
-            <Text className="text-gray-400 flex-1">
-              Я принимаю{' '}
-              <Text className="text-blue-400">Пользовательское соглашение</Text>
-              {' '}и{' '}
-              <Text className="text-blue-400">Политику конфиденциальности</Text>
-            </Text>
-          </Pressable>
-        </View>
+        <Text className="text-gray-400 text-sm mb-6">
+          Введите свой номер, чтобы продолжить регистрацию
+        </Text>
 
-        <Pressable
-          onPress={handleSubmit}
-          disabled={loading}
-          className={`rounded-2xl py-4 ${loading ? 'bg-gray-700' : 'bg-white'}`}
-        >
-          {loading ? (
-            <ActivityIndicator color="#000" />
-          ) : (
-            <Text className="text-black text-center text-lg font-semibold">
-              Отправить код
-            </Text>
-          )}
-        </Pressable>
+        <TextInput
+          placeholder="+998"
+          keyboardType="phone-pad"
+          placeholderTextColor="#666"
+          value={phone}
+          onChangeText={setPhoneLocal}
+          maxLength={13}
+          className={inputClass}
+        />
+
+        <Text className="text-xs text-gray-400 mt-4">
+          Я принимаю{' '}
+          <Text className="text-blue-400">Пользовательское соглашение</Text>
+          {' '}и{' '}
+          <Text className="text-blue-400">Политику конфиденциальности</Text>
+        </Text>
       </View>
+
+      <Pressable
+        onPress={submit}
+        disabled={loading}
+        className={`rounded-2xl py-4 ${loading ? 'bg-gray-700' : 'bg-white'}`}
+      >
+        {loading ? (
+          <ActivityIndicator color="#000" />
+        ) : (
+          <Text className="text-black text-center text-lg font-semibold">
+            Отправить код
+          </Text>
+        )}
+      </Pressable>
     </SafeAreaView>
   )
 }

@@ -9,50 +9,59 @@ export default function Register() {
   const router = useRouter()
   const { setProfileData } = useAuthStore()
 
-  const [fullName, setFullName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [username, setUsername] = useState('')
   const [birthDate, setBirthDate] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const validateFields = (): boolean => {
-    if (!fullName.trim()) {
-      Alert.alert('Xatolik', 'Familiyangizni kiriting')
-      return false
-    }
-    if (!username.trim()) {
-      Alert.alert('Xatolik', 'Username kiriting')
-      return false
-    }
-    if (username.length < 3) {
-      Alert.alert('Xatolik', 'Username kamida 3 ta belgidan iborat bo\'lishi kerak')
-      return false
-    }
-    if (!birthDate.trim()) {
-      Alert.alert('Xatolik', 'Tug\'ilgan sanangizni kiriting (DD.MM.YYYY)')
-      return false
-    }
-    if (!password || password.length < 6) {
-      Alert.alert('Xatolik', 'Parol kamida 6 ta belgidan iborat bo\'lishi kerak')
-      return false
-    }
-    if (password !== confirmPassword) {
-      Alert.alert('Xatolik', 'Parollar mos kelmadi')
-      return false
-    }
-    return true
+  const inputClass = 'bg-[#1f1f1f] text-white rounded-xl px-4 py-4 text-base'
+
+  const formatBirthDate = (text: string) => {
+    const digits = text.replace(/\D/g, '').slice(0, 8)
+    if (digits.length <= 2) return setBirthDate(digits)
+    if (digits.length <= 4) return setBirthDate(`${digits.slice(0, 2)}.${digits.slice(2)}`)
+    setBirthDate(`${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`)
   }
 
-  const handleSubmit = () => {
-    if (!validateFields()) return
+  const submit = () => {
+    const trimmed = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      username: username.trim()
+    }
+
+    if (!trimmed.firstName || !trimmed.lastName) {
+      Alert.alert('Xatolik', 'Ism va familiya majburiy')
+      return
+    }
+
+    if (!/^[a-zA-Z0-9_]{3,32}$/.test(trimmed.username)) {
+      Alert.alert('Xatolik', 'Username 3-32 belgi, faqat harf, raqam va _ bo\'lishi kerak')
+      return
+    }
+
+    if (!/^\d{2}\.\d{2}\.\d{4}$/.test(birthDate)) {
+      Alert.alert('Xatolik', 'Sana DD.MM.YYYY formatda bo\'lishi kerak')
+      return
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Xatolik', 'Parol kamida 6 ta belgi bo\'lishi kerak')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Xatolik', 'Parollar mos emas')
+      return
+    }
 
     setProfileData({
-      full_name: fullName,
-      username,
+      full_name: `${trimmed.firstName} ${trimmed.lastName}`,
+      username: trimmed.username,
       birth_date: birthDate,
-      password
+      password,
     })
 
     router.push('/(auth)/phone')
@@ -60,117 +69,98 @@ export default function Register() {
 
   return (
     <SafeAreaView className="flex-1 bg-black">
-      <ScrollView 
-        className="flex-1" 
-        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 12, paddingBottom: 32 }}
-        showsVerticalScrollIndicator={false}
+      <ScrollView
+        className="px-6"
+        contentContainerStyle={{ paddingVertical: 32 }}
+        keyboardShouldPersistTaps="handled"
       >
-        <Text className="text-gray-400 text-sm mb-6">Sign up</Text>
-        
-        <Text className="text-white text-3xl font-semibold mb-2">
+        <Text className="text-gray-400 text-sm mb-2">Sign up</Text>
+
+        <Text className="text-white text-3xl font-semibold mb-1">
           Создание профиля
         </Text>
-        <Text className="text-blue-400 text-sm mb-8">
+
+        <Text className="text-gray-400 text-sm mb-8">
           Заполните данные для регистрации
         </Text>
 
-        {/* Фамилия */}
-        <View className="mb-4">
-          <Text className="text-gray-400 text-sm mb-2">Фамилия</Text>
-          <TextInput
-            value={fullName}
-            onChangeText={setFullName}
-            placeholder="Введите фамилию"
-            placeholderTextColor="#666"
-            className="bg-[#1c1c1e] text-white rounded-xl px-4 py-4"
-          />
-        </View>
+        {/* Имя */}
+        <Text className="text-gray-400 text-sm mb-2">Имя</Text>
+        <TextInput
+          placeholder="Введите имя"
+          placeholderTextColor="#666"
+          value={firstName}
+          onChangeText={setFirstName}
+          autoCapitalize="words"
+          className={inputClass}
+        />
 
-        {/* Имя (Username) */}
-        <View className="mb-4">
-          <Text className="text-gray-400 text-sm mb-2">Имя</Text>
-          <TextInput
-            value={username}
-            onChangeText={setUsername}
-            placeholder="Введите имя"
-            placeholderTextColor="#666"
-            autoCapitalize="none"
-            className="bg-[#1c1c1e] text-white rounded-xl px-4 py-4"
-          />
-        </View>
+        {/* Фамилия */}
+        <Text className="text-gray-400 text-sm mb-2 mt-4">Фамилия</Text>
+        <TextInput
+          placeholder="Введите фамилию"
+          placeholderTextColor="#666"
+          value={lastName}
+          onChangeText={setLastName}
+          autoCapitalize="words"
+          className={inputClass}
+        />
+
+        {/* Username */}
+        <Text className="text-gray-400 text-sm mb-2 mt-4">Username</Text>
+        <TextInput
+          placeholder="Введите username"
+          placeholderTextColor="#666"
+          value={username}
+          onChangeText={(t) => setUsername(t.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())}
+          autoCapitalize="none"
+          className={inputClass}
+        />
 
         {/* Дата рождения */}
-        <View className="mb-4">
-          <Text className="text-gray-400 text-sm mb-2">Дата рождения</Text>
-          <View className="relative">
-            <TextInput
-              value={birthDate}
-              onChangeText={setBirthDate}
-              placeholder="ДД.ММ.ГГГГ"
-              placeholderTextColor="#666"
-              keyboardType="numbers-and-punctuation"
-              className="bg-[#1c1c1e] text-white rounded-xl px-4 py-4 pr-12"
-            />
-            <View className="absolute right-4 top-4">
-              <Ionicons name="calendar-outline" size={20} color="#666" />
-            </View>
-          </View>
+        <Text className="text-gray-400 text-sm mb-2 mt-4">Дата рождения</Text>
+        <View className="relative">
+          <TextInput
+            placeholder="ДД.ММ.ГГГГ"
+            placeholderTextColor="#666"
+            value={birthDate}
+            onChangeText={formatBirthDate}
+            keyboardType="number-pad"
+            className={inputClass + ' pr-12'}
+          />
+          <Ionicons
+            name="calendar-outline"
+            size={20}
+            color="#666"
+            style={{ position: 'absolute', right: 16, top: 18 }}
+          />
         </View>
 
         {/* Пароль */}
-        <View className="mb-4">
-          <Text className="text-gray-400 text-sm mb-2">Пароль</Text>
-          <View className="relative">
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Введите пароль"
-              placeholderTextColor="#666"
-              secureTextEntry={!showPassword}
-              className="bg-[#1c1c1e] text-white rounded-xl px-4 py-4 pr-12"
-            />
-            <Pressable
-              onPress={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-4"
-            >
-              <Ionicons 
-                name={showPassword ? 'eye-off-outline' : 'eye-outline'} 
-                size={20} 
-                color="#666" 
-              />
-            </Pressable>
-          </View>
-        </View>
+        <Text className="text-gray-400 text-sm mb-2 mt-4">Пароль</Text>
+        <TextInput
+          placeholder="Введите пароль (минимум 6 символов)"
+          placeholderTextColor="#666"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+          className={inputClass}
+        />
 
         {/* Подтвердите пароль */}
-        <View className="mb-8">
-          <Text className="text-gray-400 text-sm mb-2">Подтвердите пароль</Text>
-          <View className="relative">
-            <TextInput
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              placeholder="Введите пароль еще раз"
-              placeholderTextColor="#666"
-              secureTextEntry={!showConfirmPassword}
-              className="bg-[#1c1c1e] text-white rounded-xl px-4 py-4 pr-12"
-            />
-            <Pressable
-              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-4 top-4"
-            >
-              <Ionicons 
-                name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} 
-                size={20} 
-                color="#666" 
-              />
-            </Pressable>
-          </View>
-        </View>
+        <Text className="text-gray-400 text-sm mb-2 mt-4">Подтвердите пароль</Text>
+        <TextInput
+          placeholder="Введите пароль еще раз"
+          placeholderTextColor="#666"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+          autoCapitalize="none"
+          className={inputClass}
+        />
 
-        <Pressable
-          onPress={handleSubmit}
-          className="bg-white rounded-2xl py-4"
-        >
+        <Pressable onPress={submit} className="bg-white rounded-2xl py-4 mt-8">
           <Text className="text-black text-center text-lg font-semibold">
             Зарегистрироваться
           </Text>
