@@ -1,5 +1,5 @@
-import { Tabs } from 'expo-router'
 import { HomeIcon } from '@/shared/ui/icons/HomeIcon'
+import { Tabs } from 'expo-router'
 
 export default function TabsLayout() {
   return (
